@@ -26,6 +26,7 @@ def save_file(filename, json_data):
 
 #iso-8859-1
 
+lista_linhas = []
 linhas = {}
 stop_times = {}
 frequencies = {}
@@ -77,6 +78,9 @@ def get_routes(): #routes.txt
 					"name": name,
 					"sentidos": {},
 				}
+				lista_linhas.append(id)
+				lista_linhas.append(name)
+
 
 
 
@@ -224,7 +228,6 @@ def get_shapes(): #shapes.txt
 				}
 				p0 = None
 				p1 = None
-				total_distance_traveled = 0
 
 			p1 = (float(shape_pt_lat), float(shape_pt_lon))
 
@@ -276,6 +279,8 @@ get_travel_times()
 get_frequencies()
 
 save_file("../web/data/linhas.json", linhas)
+save_file("../web/data/lista_linhas.json", lista_linhas)
+
 get_shapes()
 
 #print float('120.57015')
