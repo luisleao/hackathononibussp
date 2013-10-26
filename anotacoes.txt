@@ -42,29 +42,35 @@ TODO:
 lines.json
 {
 	"106A10": {
-		"id": "106A-10",
-		"name": "Metrô Santana - Itaim Bibi",
-		"sentidos": {
-			"0": {
-				"name": "Itaim Bibi",			//GTFS:trips - headsign
-				"shape": 43387,					//GTFS:trips - id do shape
-				"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
-				"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
-				"frequence": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: headway_secs/3600
-			},
-			
-			"1": {
-				"name": "Metrô Santana",
-				"shape": 35345,
-				"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
-				"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
-				"frequence": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: headway_secs/3600
-			}
-		}
 	}
 
 }
 
+
+106A-10.json
+{
+	"id": "106A-10",
+	"name": "Metrô Santana - Itaim Bibi",
+	"sentidos": {
+		"0": {
+			"name": "Itaim Bibi",			//GTFS:trips - headsign
+			"shape": 43387,					//GTFS:trips - id do shape
+			"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
+			"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
+			"travels": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: 3600/headway_secs
+			"total_travels": 0
+		},
+
+		"1": {
+			"name": "Metrô Santana",
+			"shape": 35345,
+			"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
+			"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
+			"travels": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: 3600/headway_secs
+			"total_travels": 0
+		}
+	}
+}
 
 
 
