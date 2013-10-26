@@ -1,9 +1,14 @@
 
+datejs: https://code.google.com/p/datejs/downloads/list
+
+
+
+
 
 
 > nome do projeto
-> repositório github
-> leitura dos dados - conversão para banco sql
+OK	> repositório github
+OK	> leitura dos dados - conversão para banco sql
 > importação dos dados - ou conversão
 > desenho de interface
 > mockup de interface
@@ -18,13 +23,15 @@ mockup da interface do mapa e consulta dos dados
 interface final com carregamento dos dados e controles
 
 
+
+
 TODO:
-	> consulta geolocalização do veiculo/linha com data_hora (completa)
-	> consulta bilhetagem do veiculo/linha por data_hora (minuto)
-	> totalizar bilhetagem por hora/minuto no veiculo
-	> criar json das linhas
-	> GTFS: gerar polyline das linhas (shapes)
-	> GTFS: incluir tempo de percurso da linha
+OK	> consulta geolocalização do veiculo/linha com data_hora (completa)
+OK	> consulta bilhetagem do veiculo/linha por data_hora (minuto)
+OK	> totalizar bilhetagem por hora/minuto no veiculo
+OK	> criar json das linhas
+OK	> GTFS: gerar polyline das linhas (shapes)
+OK	> GTFS: incluir tempo de percurso da linha
 	> importar GTFS para banco
 	> calcular início de cada TRIP (aproximar do ponto 0)
 
@@ -207,6 +214,31 @@ JOIN avlid_veiculo av ON (av.nr_identificador = mov.nr_identificador)
 WHERE av.veiculo = '510136'
 
 
+
+
+
+
+
+
+>>> LINHAS SEM TRIPS <<<
+
+$.getJSON("/data/linhas.json", function(data){ 
+
+
+		for (cdlinha in data) {
+
+		var linha = data[cdlinha];
+
+		if (Object.keys(linha.sentidos).length == 0) {
+		console.log(cdlinha);
+
+		}
+
+
+		}
+
+
+ });
 
 
 

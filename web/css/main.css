@@ -1,14 +1,141 @@
+@import url(http://fonts.googleapis.com/css?family=Lato:300,400,700);
+
+
 html, body {
 	overflow: hidden;
 	width: 100%;
 	height: 100%;
-	font-size: 100%;
 	padding: 0;
 	margin: 0;
+
+	font-family: 'Lato', Calibri, Arial, sans-serif;
+	font-size: 100%;
 }
 
-#map-canvas {
+
+body {
+
+}
+
+#container {
+	width: 100%;
+	height: 100%;
+	display: table;
+}
+
+#header, #map {
+	display: table-row;	
+	width: 100%;
+}
+
+
+
+
+body.on #header {
+	height: 300px;
+}
+
+
+#header {
+	position: relative;
+	background-color: #000;
+	height: 50px;
+	overflow: hidden;
+	-webkit-transition: all 0.3s ease;
+	-moz-transition: all 0.3s ease;
+	transition: all 0.3s ease;
+
+}
+
+#header:hover {
+	height: 300px;
+	background-color: #fff;
+}
+
+
+#header #menu {
+	display: table-cell;
+	position: relative;
+	background-color: #ededed;
+}
+
+#menu_detail {
+	width: 100%;
+	position: absolute;
+	bottom: 0;
+	height: 50px;
+	background-color: #fff;
+
+	font-size: 2em;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+
+}
+#menu_detail span {
+	display: inline-table;
+	padding: .1em 1em;
 	height: 100%;
 }
 
+#menu_detail .datetime {
+	color: #fff;
+	background-color: #ed0000;
+	float: right;
+}
+#menu_detail .linha {
+	color: #fff;
+	background-color: #00ff00;
+	float: right;
+}
+
+#menu_select {
+	width: 100%;
+	position: absolute;
+	bottom: 50px;
+	height: 250px;
+	background-color: #FF0000;
+}
+#menu_select span {
+	display: block;
+}
+
+
+
+#menu_select .name_linha {
+	font-weight: 700;
+	font-size: 2em;
+}
+
+#menu_select .sentidos {
+	display: table;
+	width: 100%;
+
+}
+
+#menu_select .sentidos .sentido_item {
+	display: table-cell;
+}
+
+
+#map {
+	position: relative;
+}
+
+
+
+#map-canvas {
+	width: 100%;
+	height: 100%;
+}
+
+#fork {
+	position: relative;
+	margin-left: auto;
+	margin-bottom: -150px;
+	display: block;
+	z-index: 10;
+	width: 150px;
+	height: 150px;
+}
 

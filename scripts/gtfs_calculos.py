@@ -204,16 +204,16 @@ def get_shapes(): #shapes.txt
 			if not shapes.has_key(shape_id):
 				shapes[shape_id] = {
 					"total_distance_traveled": 0,
-					"last_shape": 0,
-					"shapes": []
+					"last_point": 0,
+					"points": []
 				}
 
 			shape = shapes[shape_id]
 
 			#shape["total_distance_traveled"] += shape_dist_traveled
-			shape["last_shape"] = shape_pt_sequence
+			shape["last_point"] = shape_pt_sequence
 
-			shape["shapes"].append({
+			shape["points"].append({
 				"lat": shape_pt_lat,
 				"lng": shape_pt_lon,
 				"sequence": shape_pt_sequence,
