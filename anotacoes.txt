@@ -1,0 +1,208 @@
+
+
+
+> nome do projeto
+> repositório github
+> leitura dos dados - conversão para banco sql
+> importação dos dados - ou conversão
+> desenho de interface
+> mockup de interface
+> apresentação
+
+
+
+deteção dos hashs e se há possibilidade de gerar o traçado ida-volta de cada um deles
+cálculos de bilhetagem de cada veículo por data/hora/localização
+gerar modelo de dados em json e identificar quais informaçõe são possíveis de calcular
+mockup da interface do mapa e consulta dos dados
+interface final com carregamento dos dados e controles
+
+
+TODO:
+	> consulta geolocalização do veiculo/linha com data_hora (completa)
+	> consulta bilhetagem do veiculo/linha por data_hora (minuto)
+	> totalizar bilhetagem por hora/minuto no veiculo
+	> criar json das linhas
+	> GTFS: gerar polyline das linhas (shapes)
+	> GTFS: incluir tempo de percurso da linha
+	> importar GTFS para banco
+	> calcular início de cada TRIP (aproximar do ponto 0)
+
+
+
+
+>>> calcular distância total do percurso usando as GTFS/shapes
+>>> calcular tempo total do percurso usando GTFS/stop_times
+
+
+
+
+
+
+lines.json
+{
+	"106A10": {
+		"id": "106A-10",
+		"name": "Metrô Santana - Itaim Bibi",
+		"sentidos": {
+			"0": {
+				"name": "Itaim Bibi",			//GTFS:trips - headsign
+				"shape": 43387,					//GTFS:trips - id do shape
+				"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
+				"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
+				"frequence": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: headway_secs/3600
+			},
+			
+			"1": {
+				"name": "Metrô Santana",
+				"shape": 35345,
+				"travel_time": 12345,			//calculo: GTFS:stop_times - tempo de percurso em segundos
+				"tracel_discance": 12345, 		//calculo: GTFS:shapes - distancia do percurso em metros
+				"frequence": [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  //calculo: GTFS:frequencies 00-23h: headway_secs/3600
+			}
+		}
+	}
+
+}
+
+
+
+
+LINHA
+VEICULO
+DATA_HORA
+
+
+
+avl_106A10-1_20131026.json
+{
+	
+}
+
+
+
+billing_106A10-1_20131026.json
+{
+	
+}
+
+199D101	11888	14/08/2013 11:19	7
+819R101	15010	14/08/2013 11:27	7
+199D101	11887	14/08/2013 11:47	7
+199D101	11887	14/08/2013 11:48	7
+819R101	15010	14/08/2013 11:00	5
+819R101	15010	14/08/2013 11:28	5
+199D101	11888	14/08/2013 11:53	5
+199D101	11898	14/08/2013 11:02	4
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+> amanhã 12h30 - entrega das apresentações
+  7 minutos de apresentação - sem perguntas
+
+  critérios: interesse publico, monitoramento participativo, criatividade, qualidade técnica
+
+
+
+
+SELECT CONCAT( linha,  "-", tipo,  "-", sentido -1 ) AS cod_linha
+FROM  `codavl_linha` 
+WHERE 1 
+LIMIT 0 , 30
+
+
+*** VINCULA AL com MO ***
+SELECT pos . * , CONCAT( al.linha,  "-", al.tipo,  "-", al.sentido -1 ) AS cod_linha
+FROM reg_pos pos
+JOIN codavl_linha al ON ( al.cd_linha = pos.cd_linha ) 
+WHERE 1 
+LIMIT 30
+
+
+
+
+*** MO + AL + AV ***
+
+SELECT mo.dt_movto, mo.dt_avl, mo.nr_latitude_grau, mo.nr_longitude_grau, av.veiculo, CONCAT( al.linha,  "", al.tipo,  "", al.sentido -1 ) AS cod_linha
+FROM reg_pos mo
+JOIN codavl_linha al ON ( al.cd_linha = mo.cd_linha ) 
+JOIN avlid_veiculo av ON ( av.nr_identificador = mo.nr_identificador ) 
+WHERE 1 
+
+>>> retorna geolocalização do veiculo/linha com data_hora
+
+
+
+
+
+
+
+
+
+*** bilhetagem total por linha ***
+SELECT linha, sentido, veiculo, COUNT( data ) AS total
+FROM  `blt_20130814` 
+WHERE 1 
+GROUP BY linha, sentido, veiculo
+ORDER BY total desc
+
+>>> retorna bilhetagem do veiculo/linha
+
+
+
+
+
+
+
+
+
+
+
+'TP_TS' = 0
+'TS_TP' = 1
+
+
+
+*** bilhetagem por linha por tempo ***
+
+SELECT CONCAT( linha, REPLACE( REPLACE( sentido,  'TP_TS', 0 ) ,  'TS_TP', 1 ) ) AS cod_linha, veiculo, SUBSTRING( data, 1, 16 ) AS tempo, COUNT( data ) AS total
+FROM  `blt_20130814` 
+WHERE 1 
+GROUP BY cod_linha, veiculo, tempo
+ORDER BY total DESC 
+LIMIT 0 , 30
+
+
+
+
+
+
+*** mov de um veiculo especifico ***
+SELECT mov.*, av.veiculo FROM reg_pos mov
+JOIN avlid_veiculo av ON (av.nr_identificador = mov.nr_identificador)
+WHERE av.veiculo = '510136'
+
+
+
+
+
+
+
