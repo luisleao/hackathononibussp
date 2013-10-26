@@ -49,7 +49,7 @@ def haversine_distance(p0, p1):
 	a = sin(dLat/2) * sin(dLat/2) + sin(dLon/2) * sin(dLon/2) * cos(lat0) * cos(lat1)
 	c = 2 * atan2(sqrt(a), sqrt(1-a));
 	d = R * c
-	return d
+	return d*1000
 
 
 def getTime(val):
