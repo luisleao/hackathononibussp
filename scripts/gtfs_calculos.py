@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sys
 import os
 import json
@@ -5,6 +7,7 @@ import pyes, pprint
 import codecs
 
 import math
+from math import radians, sin, cos, sqrt, atan2
 
 from datetime import datetime, timedelta
 from os import listdir
@@ -23,17 +26,30 @@ def save_file(filename, json_data):
 
 #iso-8859-1
 
-
-
-
-
+lista_linhas = []
 linhas = {}
 stop_times = {}
 frequencies = {}
 shapes = {}
 
 
+R = 6371; # km
+def haversine_distance(p0, p1):
 
+	lat0 =  p0[0]
+	lon0 = p0[1]
+	lat1 =  p1[0]
+	lon1 = p1[1]
+
+	dLat = radians(lat1-lat0)
+	dLon = radians(lon1-lon0)
+	lat0 = radians(lat0)
+	lat1 = radians(lat1)
+
+	a = sin(dLat/2) * sin(dLat/2) + sin(dLon/2) * sin(dLon/2) * cos(lat0) * cos(lat1)
+	c = 2 * atan2(sqrt(a), sqrt(1-a));
+	d = R * c
+	return d
 
 
 def getTime(val):
@@ -62,6 +78,9 @@ def get_routes(): #routes.txt
 					"name": name,
 					"sentidos": {},
 				}
+				lista_linhas.append(id)
+				lista_linhas.append(name)
+
 
 
 
@@ -207,19 +226,36 @@ def get_shapes(): #shapes.txt
 					"last_point": 0,
 					"points": []
 				}
+				p0 = None
+				p1 = None
+
+			p1 = (float(shape_pt_lat), float(shape_pt_lon))
+
+			if(p0 != None and p1 != None):
+				d = haversine_distance(p0, p1)
+			else:
+				d = 0
+				#raw_input("continue...")
+			p0 = p1
+
+			#print d
+			#print total_distance_traveled
+			#sys.stdout.write(str(total_distance_traveled))
+			#sys.stdout.write('\r')
+			#raw_input("continue...")
 
 			shape = shapes[shape_id]
 
 			#shape["total_distance_traveled"] += shape_dist_traveled
 			shape["last_point"] = shape_pt_sequence
+			shape["total_distance_traveled"] = shape["total_distance_traveled"]+d
 
 			shape["points"].append({
 				"lat": shape_pt_lat,
 				"lng": shape_pt_lon,
 				"sequence": shape_pt_sequence,
-				"distance_traveled": 0
+				"distance_traveled": d
 			})
-
 
 		for id in linhas:
 			linha = linhas[id]
@@ -243,6 +279,8 @@ get_travel_times()
 get_frequencies()
 
 save_file("../web/data/linhas.json", linhas)
+save_file("../web/data/lista_linhas.json", lista_linhas)
+
 get_shapes()
 
 #print float('120.57015')
