@@ -71,12 +71,17 @@ var loadLine = function(line){
 		$(".name_linha").text(current_line.name);
 
 
+		$(".sentidos").empty();
+
 		for(sentido_idx in current_line.sentidos) {
 			var sentido = current_line.sentidos[sentido_idx];
 			var travel_time = formataTempo(sentido.travel_time);
 
-
+			var layer_sentido = $(document.createElement("div"));
 			
+
+
+
 			console.log(sentido_idx, sentido.travel_time, travel_time);
 			$(".travel_time").text(travel_time);
 			//console.log(sentido_idx, data.sentidos[sentido_idx].shapes.points);
