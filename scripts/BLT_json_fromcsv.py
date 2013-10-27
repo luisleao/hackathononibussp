@@ -43,13 +43,13 @@ for row in csv_data:
     blt_hshmap[cod_linha] = { "cod_linha" : cod_linha, "veiculos" : {} }
 
   if not blt_hshmap[cod_linha]["veiculos"].has_key(veiculo):
-    blt_hshmap[cod_linha]["veiculos"][veiculo] = {}
+    blt_hshmap[cod_linha]["veiculos"][veiculo] = []
 
-  if not blt_hshmap[cod_linha]["veiculos"][veiculo].has_key(data):
-    blt_hshmap[cod_linha]["veiculos"][veiculo][data] = [0]
+  #if not blt_hshmap[cod_linha]["veiculos"][veiculo].has_key(data):
+  #  blt_hshmap[cod_linha]["veiculos"][veiculo][data] = [0]
 
-  blt_hshmap[cod_linha]["veiculos"][veiculo][data] = [blt_hshmap[cod_linha]["veiculos"][veiculo][data][0] + 1, int(sentido)]
-  #blt_hshmap[cod_linha]["veiculos"][veiculo].append(data)
+  #blt_hshmap[cod_linha]["veiculos"][veiculo] = [data, blt_hshmap[cod_linha]["veiculos"][veiculo][1] + 1, int(sentido)]
+  blt_hshmap[cod_linha]["veiculos"][veiculo].append([data, 1, int(sentido)])
 
   #print blt_hshmap
   #raw_input("continue...")
