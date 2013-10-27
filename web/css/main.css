@@ -124,16 +124,19 @@ body.on #header .linha {
 }
 
 
+.white, .white a {
+  color: #fff;
+}
 
 
 #menu_detail .datetime {
 	color: #fff;
-	background-color: #ed0000;
+	background-color: #008a00;
 	float: right;
 }
 #menu_detail .linha {
 	color: #fff;
-	background-color: #00ff00;
+	background-color: #009d9d;
 	float: right;
 }
 #menu_detail div {
@@ -152,6 +155,8 @@ body.on #header .linha {
 	top: 50px;
 	height: 250px;
 	padding: 30px;
+	background-color: #009d9d;
+	color: #fff;
 }
 
 
@@ -167,11 +172,20 @@ body.on #header .linha {
 #menu_select .sentidos {
 	display: table;
 	width: 100%;
+}
 
+#menu_select .sentidos ul {
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
 }
 
 #menu_select .sentidos .sentido_item {
 	display: table-cell;
+}
+
+#menu_select .sentidos .item {
+	line-height: 2em;
 }
 
 #menu_select .sentidos .spark {

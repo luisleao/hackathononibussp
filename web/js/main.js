@@ -3,8 +3,12 @@ var map;
 
 
 var current_line;
+var current_time = 0;
 var polylines = [];
 
+var tmrInterval;
+var mapOptions;
+var saopaulo;
 
 
 var PARAMS = {
@@ -15,16 +19,19 @@ var PARAMS = {
 	1: {
 		name: "Volta",
 		cor: "#555510"
-	}
+	},
+	interval: 1
 }
 
 
 
 
+var atualiza_tempo = function(){
+	//console.log("ping");
+	current_time++;
 
-
-var mapOptions;
-var saopaulo;
+	$(".datetime").text(formataTempo(current_time));
+};
 
 
 var initializeMap = function() {
@@ -55,7 +62,7 @@ var formataTempo = function(seconds) {
 	//TODO: formatar tempo em 00h 00'00"
 	return (new Date).clearTime()
           .addSeconds(seconds)
-          .toString('H:mm:ss');;
+          .toString('HH:mm:ss');;
 }
 
 var loadLine = function(line){
@@ -70,16 +77,11 @@ var loadLine = function(line){
 		clearPolylines();
 
 		$(".linha .numero").text(current_line.id);
-		$(".name_linha").text(current_line.name);
+		$(".name_linha").text(" " + current_line.name).prepend($("<small/>").text(current_line.id));
 
 		$(".sentidos").empty();
 
 		for(sentido_idx in current_line.sentidos) {
-			var sentido = current_line.sentidos[sentido_idx];
-			var travel_time = formataTempo(sentido.travel_time);
-
-			var layer_sentido = $(document.createElement("div")).addClass("sentido_item").attr("id", "sentido_" + sentido_idx);
-
 
 			var glyphicon_time = $("<span/>").addClass("glyphicon glyphicon-time");
 			var glyphicon_road = $("<span/>").addClass("glyphicon glyphicon-road");
@@ -88,26 +90,34 @@ var loadLine = function(line){
 			var glyphicon_left = $("<span/>").addClass("glyphicon glyphicon-chevron-left");
 			var glyphicon_right = $("<span/>").addClass("glyphicon glyphicon-chevron-right");
 
+
+			var sentido = current_line.sentidos[sentido_idx];
+			var travel_time = formataTempo(sentido.travel_time);
+
+			var layer_sentido = $(document.createElement("div")).addClass("sentido_item").attr("id", "sentido_" + sentido_idx);
 			var span_partida = $("<small/>").text("partida: ");
 
 
 
-			layer_sentido.append($("<div/>").addClass("name").text(" " + sentido.name).prepend(span_partida)); //sentido_idx == 0 ? glyphicon_right : glyphicon_left));
-			layer_sentido.append($("<div/>").addClass("travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time));
-			layer_sentido.append($("<div/>").addClass("travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road));
-			layer_sentido.append($("<div/>").addClass("total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list));
+			layer_sentido.append($("<span/>").addClass("item name").text(" " + sentido.name).prepend(span_partida)).append($("<br/>")); //sentido_idx == 0 ? glyphicon_right : glyphicon_left));
+			layer_sentido.append($("<span/>").addClass("item travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time)).append($("<br/>"));
+			layer_sentido.append($("<span/>").addClass("item travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road)).append($("<br/>"));
+			layer_sentido.append($("<span/>").addClass("item total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list)).append($("<br/>"));
 			//layer_sentido.append($("<div/>").addClass("working").text(sentido.working));
-			layer_sentido.append($("<div/>").addClass("spark travel_" + sentido_idx));
+			layer_sentido.append($("<span/>").addClass("item spark travel_" + sentido_idx).attr("title", "Viagens por horas [00-23]"));
 
 
 			$(".sentidos").append(layer_sentido);
-			$(".sentidos .travel_" + sentido_idx).sparkline(sentido.travels, { type: 'bar', zeroAxis: false, disableTooltips: true });
+			$(".sentidos .travel_" + sentido_idx).sparkline(sentido.travels, { type: 'bar', barColor: '#aaffff', zeroAxis: false, disableTooltips: true });
 			
 			console.log(sentido_idx, sentido.travel_time, travel_time);
 			drawPolyLine(sentido.shapes.points, PARAMS[sentido_idx].cor);
 		}
 
-		//TODO: carregar dados de IDA e VOLTA
+
+		$(".sentidos .item").tooltip();
+
+		//carregar traçados de IDA e VOLTA
 		if (polylines.length > 0) {
 			var latlngbounds = new google.maps.LatLngBounds();
 			for (polyline_idx in polylines) {
@@ -132,6 +142,12 @@ var loadLine = function(line){
 
 		if (!$("body").hasClass("on"))
 			$("body").addClass("on");
+
+
+		current_time = 0;
+		if (atualiza_tempo) window.clearInterval(atualiza_tempo);
+		tmrInterval = window.setInterval(atualiza_tempo, PARAMS.interval);
+
 
 	});
 

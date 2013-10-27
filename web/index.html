@@ -30,7 +30,7 @@
 
 					<div class="city">
 						<span class="nome_projeto">
-							de <span class="glyphicon glyphicon-eye-open"></span> no ônibus
+							de <span class="glyphicon glyphicon-eye-open" style="top: .1em;"></span> no ônibus
 						</span>
 						<span class="sobre_projeto">
 							<a data-toggle="modal" href="#modal_sobre" class="btn btn-link"><span class="glyphicon glyphicon-question-sign" ></span> Sobre este aplicativo</a>
@@ -39,7 +39,7 @@
 
 					<div class="linha">
 						<span class="numero">{{numero}}</span>
-						<span class="troca">
+						<span class="troca white">
 							<a data-toggle="modal" href="#modal_selecionalinha" class="btn btn-link"><span class="glyphicon glyphicon-pencil"></span> escolher linha</a>
 						</span>
 					</div>
@@ -102,16 +102,91 @@
 	<div id="modal_sobre" class="modal fade" id="myModal" tabindex="-1" role="dialog">
 		<div class="modal-dialog" style="width: 800px;">
 
+<div class="jumbotron">
+  <div class="container">
+    <h2>Mais informações sobre as linhas de ônibus de São Paulo</h2>
+
+	<p>
+		Criado por <a href="https://facebook.com/luis.leao" target="_blank">Luís Leão</a> e <a href="https://facebook.com/paulomuggler" target="_blank">Paulo Muggler</a> durante o primeiro <a href="http://www.saopauloaberta.com.br/#hackatona" target="_blank">Hackathon do Ônibus de São Paulo</a> em outubro/2013.
+	</p>
+
+	<small>
+
+		<p>
+		Este aplicativo pode ser utilizado por gestores da SPTrans para identificar informações importantes sobre bilhetagem vinculada a localização dos ônibus, em uma interface amigável, simples e rápida.
+		</p>
+		<p>Consumimos informações das bases GTFS, AVL e de bilhetagem. Foi realizada uma normalização dos dados para que os índices fossem compatíveis e os registros foram transformados em arquivos estáticos no formato JSON.</p>
+
+
+	</small>
+    <p><a class="btn btn-primary btn-lg" data-dismiss="modal" >voltar</a></p>
+  </div>
+</div>
+
+		</div>
+	</div>
+
+
+	<div id="modal_sobre2" class="modal fade" id="myModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" style="width: 800px;">
+
 		<div class="modal-content" style="min-height: 300px;">
 			<div class="modal-header">
 				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Sobre este aplicativo</h4>
+				<h4 class="modal-title"><span class="glyphicon glyphicon-question-sign" ></span> Sobre este aplicativo</h4>
 			</div>
 
 			<div class="modal-body" style="background-color: #fff;">
 				<div class="row">
 					<div class="col-lg-12">
-						<p class="lead">Lorem ipsum dolor...</p>
+
+				<h2>Como melhorar a experiência do usuário de ônibus de São Paulo?</h2>
+
+				<p>
+						Criado por <a href="https://facebook.com/luis.leao" target="_blank">Luís Leão</a> e <a href="https://facebook.com/paulomuggler" target="_blank">Paulo Muggler</a> durante o primeiro <a href="http://www.saopauloaberta.com.br/#hackatona" target="_blank">Hackathon do Ônibus de São Paulo</a> em outubro/2013.
+				</p>
+
+
+<!--
+
+						<p>
+						Este aplicativo pode ser utilizado por gestores da SPTrans para identificar informações importantes sobre bilhetagem vinculada a localização dos ônibus, em uma interface amigável, simples e rápida.
+						</p>
+
+
+						<p>
+								Criado por <a href="https://facebook.com/luis.leao" target="_blank">Luís Leão</a> e <a href="https://facebook.com/paulomuggler" target="_blank">Paulo Muggler</a> durante o primeiro <a href="http://www.saopauloaberta.com.br/#hackatona" target="_blank">Hackathon do Ônibus de São Paulo</a> em outubro/2013.
+						</p>
+
+
+						<div class="row">
+
+							<div class="col-lg-6">
+
+
+								<p>O aplicativo consome informações das bases GTFS, AVL e de bilhetagem. Foi realizada uma normalização dos dados para que os índices fossem compatíveis e os registros foram transformados em arquivos estáticos no formato JSON.</p>
+
+
+							</div>
+
+							<div class="col-lg-6">
+
+
+								<p>Os scripts de tratamento das bases também estão disponíveis.</p>
+
+							</div>
+
+
+						</div>
+
+						<p>&nbsp;</p>
+						<p>Em breve teremos uma versão com consulta da API do Olho Vivo em tempo real!</p>
+
+						<p class="lead">
+						Você pode baixar e remixar o código! <br/>Acesse o <a href="https://github.com/luisleao/hackathononibussp" targer="_blank">github do projeto</a> para saber mais.</p>
+-->
+
+
 					</div>
 				</div>
 			</div>
