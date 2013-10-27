@@ -13,9 +13,10 @@ var PARAMS = {
 		name: "Volta",
 		cor: "#555510"
 	},
-	interval: 1,
+	interval: 10,
 	date: new Date(2013, 5, 1),
-	start_time: 10000
+	start_time: 10000,
+	time_add: 35
 
 }
 
@@ -95,22 +96,24 @@ var atualiza_tempo = function(){
 
 	// não conta tempo enquanto nao carregar AVL
 
-	current_time+=10;
+	current_time+=PARAMS.time_add;
 	if (current_time >= 86400) {
 		current_time = PARAMS.start_time;
 		//clearMarkers();
 		//for(cod_veiculo in current_line.veiculos) {
 		//	addMarker(cod_veiculo, current_line.veiculos[cod_veiculo]);
 		//}
-		for (idx_marker in markers) {
-			markers[idx_marker].setIcon(icon_gray);
+		$(".datetime").text("---");
+		//for (idx_marker in markers) {
+			//markers[idx_marker].setIcon(icon_gray);
 			//markers[idx_marker].setVisible(false);
-			markers[idx_marker].setMap(null);
-		}
+			//markers[idx_marker].setMap(null);
+		//}
 		if (tmrInterval) {
 			window.clearInterval(tmrInterval);
 			tmrInterval = null;
 		}
+		return;
 
 	}
 
@@ -155,7 +158,8 @@ var atualiza_tempo = function(){
 
 					//var total_bilhetagem = $("#sentido_"+sentido_idx+" .total_bilhetagem");
 					//total_bilhetagem.text(parseInt(total_bilhetagem.text()) + blt[0][1]);
-					blts.push(blts.shift());
+					//blts.push(blts.shift());
+					blts.shift();
 				} else {
 					break;
 				}
@@ -179,7 +183,7 @@ var atualiza_tempo = function(){
 			var blt_item = veiculo[idx];
 			if (blt_item[0]*1000 <= data) {
 
-				console.log("carrega bilhete ", blt_item);
+				// console.log("carrega bilhete ", blt_item);
 				total_blt += blt_item[1];
 
 				var sentido = current_line.sentidos[blt_item[2]];
@@ -239,11 +243,12 @@ var formataTempo = function(seconds) {
 var loadLine = function(line){
 	current_line = null;
 	total_blt = 0;
-	console.log("carregando linha ", line);
+	// console.log("carregando linha ", line);
 	$(".total_bilhetagem .valor").text("0 bilhetes");	
+	$(".datetime").text("---");
 
 	jQuery.getJSON("/data/linhas/"+line+".json", function(data){
-		console.log(line, data);
+		//console.log(line, data);
 		current_line = data;
 		current_line.veiculos = {};
 		current_line.blts = {};
@@ -330,7 +335,7 @@ var loadLine = function(line){
 			layer_sentido.append($("<span/>").addClass("item travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list)).append($("<br/>"));
-			layer_sentido.append($("<span/>").addClass("item total_bilhetagem").attr("title", "Total de bilhetagem").append($("<span/>").addClass("valor").text("0 bilhetes")).prepend(glyphicon_tags)).append($("<br/><br/>"));
+			layer_sentido.append($("<span/>").addClass("item total_bilhetagem").attr("title", "Total de bilhetagem").append($("<span/>").addClass("valor").text("000 bilhetes")).prepend(glyphicon_tags)).append($("<br/><br/>"));
 			//layer_sentido.append($("<div/>").addClass("working").text(sentido.working));
 			layer_sentido.append($("<span/>").addClass("item spark travel_" + sentido_idx).attr("title", "Viagens por horas [00-23]"));
 
@@ -338,7 +343,7 @@ var loadLine = function(line){
 			$(".sentidos").append(layer_sentido);
 			$(".sentidos .travel_" + sentido_idx).sparkline(sentido.travels, { type: 'bar', barColor: '#aaffff', zeroAxis: false, disableTooltips: true });
 			
-			console.log(sentido_idx, sentido.travel_time, travel_time);
+			//console.log(sentido_idx, sentido.travel_time, travel_time);
 			drawPolyLine(sentido.shapes.points, PARAMS[sentido_idx].cor);
 		}
 
@@ -349,7 +354,7 @@ var loadLine = function(line){
 		if (polylines.length > 0) {
 			var latlngbounds = new google.maps.LatLngBounds();
 			for (polyline_idx in polylines) {
-				console.log(polylines[polyline_idx].getPath().length);
+				//console.log(polylines[polyline_idx].getPath().length);
 				var path_array = polylines[polyline_idx].getPath().getArray();
 				
 				for (array_idx in path_array) {
@@ -420,7 +425,7 @@ var drawPolyLine = function(shapes, color){
 
    	//TODO: remover linha a seguir
 	var lengthInMeters = google.maps.geometry.spherical.computeLength(polyline.getPath());
-   	console.log("distancia ", lengthInMeters)
+   	// console.log("distancia ", lengthInMeters)
 
 
 
@@ -431,7 +436,7 @@ var drawPolyLine = function(shapes, color){
 
 jQuery(document).ready(function($) {
 
-	console.log("init");
+	// console.log("init");
 	google.maps.event.addDomListener(window, 'load', initializeMap);
 	
 
@@ -461,11 +466,11 @@ jQuery(document).ready(function($) {
 	$("body").on("keypress", function (e) {
 		if (e.charCode == 32 || e.keyCode == 32) {
 			if (tmrInterval) {
-				console.log("parou timer");
+				// console.log("parou timer");
 				window.clearInterval(tmrInterval);
 				tmrInterval = null;
 			} else {
-				console.log("voltou timer");
+				// console.log("voltou timer");
 				tmrInterval = window.setInterval(atualiza_tempo, PARAMS.interval);
 			}
 		}
