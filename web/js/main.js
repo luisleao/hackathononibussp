@@ -2,14 +2,6 @@ var map;
 	google.maps.visualRefresh = true;
 
 
-var current_line;
-var current_time = 0;
-var polylines = [];
-var markers = {};
-
-var tmrInterval;
-var mapOptions;
-var saopaulo;
 
 
 var PARAMS = {
@@ -22,33 +14,41 @@ var PARAMS = {
 		cor: "#555510"
 	},
 	interval: 1,
-	date: new Date(2013, 5, 1)
+	date: new Date(2013, 5, 1),
+	start_time: 10000
 
 }
+
+var current_line;
+var current_time = PARAMS.start_time;
+var polylines = [];
+var markers = {};
+
+var tmrInterval;
+var mapOptions;
+var saopaulo;
 
 
 
 
 
 var addMarker = function(cod_veiculo, veiculo){
-	console.log("addmarker ", veiculo);
 
 	//TODO: adicionar marcador na lista, deixar oculto e exibir quando o tempo tiver AVL
     var marker = new google.maps.Marker({
       position: new google.maps.LatLng(veiculo[0][1], veiculo[0][2]),
-      map: map,
+      //map: map,
       animation: google.maps.Animation.DROP,
-      //icon: icon_grey,
-      visible: false
+      icon: icon_gray,
+      //visible: false
     });
 
-    marker.infoWindow = new google.maps.InfoWindow();
+    //marker.infoWindow = new google.maps.InfoWindow();
+    //google.maps.event.addListener(marker, 'click', function(event){
+	//	if (this.infoWindow) this.infoWindow.open(map, this);
+    //});
 
-    google.maps.event.addListener(marker, 'click', function(event){
-		if (this.infoWindow) this.infoWindow.open(map, this);
-    });
-
-    veiculo.marker = marker;
+    //veiculo.marker = marker;
     markers[cod_veiculo] = marker;
 }
 
@@ -72,15 +72,15 @@ var carregou_blt = function(){
 }
 
 
+var icon_gray = "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_gray.png";
 var icon_orange = "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_orange.png";
 var icon_blue = "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_blue.png"
 
 
 
-
 var atualiza_tempo = function(){
 	// so rodar se tiver carregado AVL de todos os sentidos
-	if (!carregou_avl)
+	if (!carregou_avl())
 		return;
 
 	if (carregou_avl() && !current_line.carregou_sentidos) {
@@ -93,9 +93,24 @@ var atualiza_tempo = function(){
 
 	// não conta tempo enquanto nao carregar AVL
 
-	current_time+=1;
-	if (current_time >= 86400)
-		current_time = 0;
+	current_time+=10;
+	if (current_time >= 86400) {
+		current_time = PARAMS.start_time;
+		//clearMarkers();
+		//for(cod_veiculo in current_line.veiculos) {
+		//	addMarker(cod_veiculo, current_line.veiculos[cod_veiculo]);
+		//}
+		for (idx_marker in markers) {
+			markers[idx_marker].setIcon(icon_gray);
+			//markers[idx_marker].setVisible(false);
+			markers[idx_marker].setMap(null);
+		}
+		if (tmrInterval) {
+			window.clearInterval(tmrInterval);
+			tmrInterval = null;
+		}
+
+	}
 
 
 	var data = PARAMS.date.getTime() + current_time*1000;
@@ -103,35 +118,25 @@ var atualiza_tempo = function(){
 	$(".datetime").text(new Date(data).toString("dd/MM/yyyy HH:mm:ss")); //new Date(data/1000 + (current_time))); //formataTempo(current_time));
 
 	//percorrer veiculos
-	//ver se timestamp do item eh menor e fazer o pop e transferir pra veiculo_old
-	//
-	//for(m in markers) { markers[m].setVisible(m == "11483")};
+	//ver se timestamp do item eh menor ele muda na fila
 
 	for (veiculo_idx in current_line.veiculos) {
 
-		//if (veiculo_idx != "11483") continue;
-		//veiculo_idx = "11483";
-
-		//console.log(veiculo_idx);
-		var veiculo = current_line.veiculos[veiculo_idx];
+		var veiculo = current_line.veiculos[veiculo_idx]; //array
 		for (idx in veiculo) {
-			item = veiculo[idx];
-
-			//console.log(item[0]*1000 <= data, item[0]*1000, data);
-
-			if (item[0]*1000 <= data) {
-				veiculo_avl = veiculo.shift();
-				//console.log("virou ", new Date(veiculo_avl[0]*1000));
-				//map.setCenter(new google.maps.LatLng(veiculo_avl[1], veiculo_avl[2]));
-
-				markers[veiculo_idx].setPosition(new google.maps.LatLng(veiculo_avl[1], veiculo_avl[2]));
+			var avl_item = veiculo[idx];
+			if (avl_item[0]*1000 <= data) {
 				markers[veiculo_idx].setVisible(true);
-				markers[veiculo_idx].setIcon(veiculo_avl[3] == 0 ? icon_orange : icon_blue);
-				veiculo.push(veiculo_avl);
+				markers[veiculo_idx].setMap(map);
+				markers[veiculo_idx].setPosition(new google.maps.LatLng(avl_item[1], avl_item[2]));
+				markers[veiculo_idx].setIcon(avl_item[3] == 0 ? icon_orange : icon_blue);
+				veiculo.push(veiculo.shift());
+
 			} else {
 				break;
 			}
 		}
+
 	}
 
 
@@ -184,6 +189,7 @@ var loadLine = function(line){
 
 		//desenhar no mapa o tracado dos sentidos da linha
 		clearPolylines();
+		clearMarkers();
 
 		$(".linha .numero").text(current_line.id);
 		$(".name_linha").text(" " + current_line.name).prepend($("<small/>").text(current_line.id));
@@ -306,7 +312,7 @@ var loadLine = function(line){
 
 
 		current_time = 0;
-		if (atualiza_tempo) window.clearInterval(atualiza_tempo);
+		if (tmrInterval) window.clearInterval(tmrInterval);
 		tmrInterval = window.setInterval(atualiza_tempo, PARAMS.interval);
 
 
@@ -322,6 +328,14 @@ var clearPolylines = function(){
 	polylines = [];
 
 }
+var clearMarkers = function(){
+	for (idx in markers) {
+		markers[idx].setMap(null);
+	}
+	markers = {};
+}
+
+
 
 var drawPolyLine = function(shapes, color){
 	//console.log("POLY ", color, shapes);
@@ -381,6 +395,20 @@ jQuery(document).ready(function($) {
 			$("#modal_selecionalinha").modal("hide");
 
 		});
+
+
+	$("body").on("keypress", function (e) {
+		if (e.charCode == 32 || e.keyCode == 32) {
+			if (tmrInterval) {
+				console.log("parou timer");
+				window.clearInterval(tmrInterval);
+				tmrInterval = null;
+			} else {
+				console.log("voltou timer");
+				tmrInterval = window.setInterval(atualiza_tempo, PARAMS.interval);
+			}
+		}
+	});
 
 
 });
