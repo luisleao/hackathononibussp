@@ -48,7 +48,7 @@ var addMarker = function(cod_veiculo, veiculo){
 
     marker.infoWindow = new google.maps.InfoWindow();
     google.maps.event.addListener(marker, 'click', function(event){
-		if (this.infoWindow) this.infoWindow.open(map, this);
+		//if (this.infoWindow) this.infoWindow.open(map, this);
     });
 
     //veiculo.marker = marker;
