@@ -1,22 +1,19 @@
 #!/usr/bin/python
-#simple python csv parser that export Comma
-#Separated Value data into a MySQL database.
-#phillip@bailey.st
 import csv
-import MySQLdb
 import sys
+import datetime
+from time import strptime
 
-#if(not(sys.argv[1] and sys.argv[2])):
-#  print "usage: <script> <file name> <table name>"
-#  sys.exit(0)
+#TABELA;ATRIBUTOS;DESCRIÇÃO
+#;;
+#B_AAMMDD;;Registro de bilhetagem
+#;data;data da utilização
+#;hash;hash bilhete
+#;sentido;sentido trajeto
+#;veiculo;prefixo do veículo
+#;validador;código do validador
+#;linha;número e tipo de linha
 
-# open the connection to the MySQL server.
-# using MySQLdb
-mydb = MySQLdb.connect(host='localhost',
-    user='root',
-    passwd='muggler',
-    db='hackatonsptrans2013')
-cursor = mydb.cursor()
 # read the presidents.csv file using the python
 # csv module http://docs.python.org/library/csv.html
 csv_data = csv.reader(file(sys.argv[1]), delimiter='|')
@@ -26,7 +23,9 @@ csv_data = csv.reader(file(sys.argv[1]), delimiter='|')
 i = 0
 for row in csv_data:
   i = i+1
-  #print row
+  d = datetime.datetime(*strptime(row[0], "%d/%m/%Y %H:%M:%S")[0:6])
+  row[0] = d
+  #print row[0]
   #sys.exit(0)
   cursor.execute('INSERT INTO BLT (data ,hash \
                 ,sentido ,veiculo ,validador ,linha)' \
@@ -34,7 +33,9 @@ for row in csv_data:
   #print cursor._last_executed
   if (i%1000 == 0):
     mydb.commit()
-    print cursor._last_executed
+    sys.stdout.write(str(i))
+    sys.stdout.write('\r')
+    #print cursor._last_executed
 #close the connection to the database.
 mydb.commit()
 cursor.close()
