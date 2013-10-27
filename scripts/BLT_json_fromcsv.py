@@ -33,7 +33,7 @@ for row in csv_data:
   i = i+1
 
   data = datetime(*strptime(row[0], "%d/%m/%Y %H:%M:%S")[0:6]).strftime("%s")
-  cod_linha = ('0' if row[2] == "TP_TS" else '1') + row[5]
+  cod_linha = row[5] + ('0' if row[2] == "TP_TS" else '1')
   veiculo = str(row[3])
 
   blt_hshmap
