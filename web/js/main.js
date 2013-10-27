@@ -5,6 +5,7 @@ var map;
 var current_line;
 var current_time = 0;
 var polylines = [];
+var markers = {};
 
 var tmrInterval;
 var mapOptions;
@@ -20,17 +21,86 @@ var PARAMS = {
 		name: "Volta",
 		cor: "#555510"
 	},
-	interval: 1
+	interval: 1,
+	date: new Date(2013, 6, 1)
+
 }
 
 
 
 
-var atualiza_tempo = function(){
-	//console.log("ping");
-	current_time++;
 
-	$(".datetime").text(formataTempo(current_time));
+var addMarker = function(cod_veiculo, veiculo){
+	console.log("addmarker ", veiculo);
+
+
+	//TODO: adicionar marcador na lista, deixar oculto e exibir quando o tempo tiver AVL
+    var marker = new google.maps.Marker({
+      position: new google.maps.LatLng(veiculo[0][1], veiculo[0][2]),
+      map: map,
+      animation: google.maps.Animation.DROP,
+      //icon: icon_grey,
+      //visible: false
+    });
+
+    marker.infoWindow = new google.maps.InfoWindow();
+
+    google.maps.event.addListener(marker, 'click', function(event){
+		if (this.infoWindow) this.infoWindow.open(map, this);
+    });
+
+    veiculo.marker = marker;
+    markers[cod_veiculo] = marker;
+}
+
+
+var carregou_avl = function(){
+	for (var sentido_idx in current_line.sentidos) {
+		if (!current_line.sentidos[sentido_idx].carregou_avl){
+			return false;
+		}
+	}
+	return true;
+}
+
+var carregou_blt = function(){
+	for (var sentido_idx in current_line.sentidos) {
+		if (!current_line.sentidos[sentido_idx].carregou_blt){
+			return false;
+		}
+	}
+	return true;
+}
+
+
+
+
+
+
+var atualiza_tempo = function(){
+	// so rodar se tiver carregado AVL de todos os sentidos
+	if (!carregou_avl)
+		return;
+
+	if (carregou_avl() && !current_line.carregou_sentidos) {
+		//TODO: criar marcadores dos veiculos
+		for(cod_veiculo in current_line.veiculos) {
+			addMarker(cod_veiculo, current_line.veiculos[cod_veiculo]);
+		}
+		current_line.carregou_sentidos = true;
+	}
+
+	// não conta tempo enquanto nao carregar AVL
+
+	current_time++;
+	if (current_time >= 86400)
+		current_time = 0;
+
+	var data = PARAMS.date.getTime() + current_time*1000;
+
+
+
+	$(".datetime").text(new Date(data).toString("dd/MM/yyyy HH:mm:ss")); //new Date(data/1000 + (current_time))); //formataTempo(current_time));
 };
 
 
@@ -72,6 +142,9 @@ var loadLine = function(line){
 	jQuery.getJSON("/data/linhas/"+line+".json", function(data){
 		console.log(line, data);
 		current_line = data;
+		current_line.veiculos = {};
+		current_line.carregou_sentidos = false;
+
 
 		//desenhar no mapa o tracado dos sentidos da linha
 		clearPolylines();
@@ -81,7 +154,64 @@ var loadLine = function(line){
 
 		$(".sentidos").empty();
 
-		for(sentido_idx in current_line.sentidos) {
+		for (var sentido_idx in current_line.sentidos) {
+
+			var sentido = current_line.sentidos[sentido_idx];
+			var travel_time = formataTempo(sentido.travel_time);
+
+			// carregar AVL
+			sentido.carregou_avl = false;
+			jQuery.getJSON("/data/linhas/avl/"+line.replace("-","")+sentido_idx+"_avl.json", function(data) {
+				var sentido_idx = data.cod_linha.substring(data.cod_linha.length-1);
+				var sentido = current_line.sentidos[sentido_idx];
+
+				for (var veiculo_id in data.veiculos) {
+					var avls = data.veiculos[veiculo_id]; //eh um array
+					if (!current_line.veiculos[veiculo_id]) {
+						current_line.veiculos[veiculo_id] = [];
+					}
+
+					for (avl_idx in avls) {
+						avl_item = avls[avl_idx];
+						avl_item[0] = parseInt(avl_item[0]); //TODO: BUG - corrigir importacao do AVL e passar inteiro direto
+						avl_item.push(parseInt(sentido_idx)); //TODO: BUG - formatar codigo da linha e criar campo com sentido
+						current_line.veiculos[veiculo_id].push(avl_item);
+					}
+				}
+				sentido.carregou_avl = true;
+			});
+
+
+			// carregar BLT
+			sentido.carregou_blt = false;
+			jQuery.getJSON("/data/linhas/blt/"+line.replace("-","")+sentido_idx+"_blt.json", function(data) {
+				console.log("data blt", data);
+				//TODO: ver dados BLT e inserir na planilha
+				/*
+				var sentido_idx = data.cod_linha.substring(data.cod_linha.length-1);
+				for (var veiculo_id in data.veiculos) {
+					if (!sentido.veiculos[veiculo_id]) {
+						sentido.veiculos[veiculo_id] = [];
+					}
+					veiculo_avl = sentido.veiculos[veiculo_id];
+					var avls = data.veiculos[veiculo_id]; //eh um array
+					for (avl_idx in avls) {
+						avl_item = avls[avl_idx];
+						avl_item[0] = parseInt(avl_item[0]); //TODO: BUG - corrigir importacao do AVL e passar inteiro direto
+						avl_item.push(parseInt(sentido_idx)); //TODO: BUG - formatar codigo da linha e criar campo com sentido
+					}
+					//concatenar arrays de avl
+					veiculo_avl.concat(avls);
+				}
+				*/
+				sentido.carregou_blt = true;
+
+			}); //.fail(function(){}).complete(function(){console.log("complete", sentido_idx);});
+
+
+			var layer_sentido = $(document.createElement("div")).addClass("sentido_item").attr("id", "sentido_" + sentido_idx);
+			var span_partida = $("<small/>").text("partida: ");
+
 
 			var glyphicon_time = $("<span/>").addClass("glyphicon glyphicon-time");
 			var glyphicon_road = $("<span/>").addClass("glyphicon glyphicon-road");
@@ -91,11 +221,6 @@ var loadLine = function(line){
 			var glyphicon_right = $("<span/>").addClass("glyphicon glyphicon-chevron-right");
 
 
-			var sentido = current_line.sentidos[sentido_idx];
-			var travel_time = formataTempo(sentido.travel_time);
-
-			var layer_sentido = $(document.createElement("div")).addClass("sentido_item").attr("id", "sentido_" + sentido_idx);
-			var span_partida = $("<small/>").text("partida: ");
 
 
 
