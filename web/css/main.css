@@ -32,7 +32,7 @@ body {
 
 
 body.on #header:hover {
-	height: 300px;
+	height: 320px;
 }
 
 #header .linha {
@@ -153,8 +153,8 @@ body.on #header .linha {
 	width: 100%;
 	position: absolute;
 	top: 50px;
-	height: 250px;
-	padding: 30px;
+	height: 270px;
+	padding: 10px 30px 30px 30px;
 	background-color: #009d9d;
 	color: #fff;
 }
@@ -189,7 +189,6 @@ body.on #header .linha {
 }
 
 #menu_select .sentidos .spark {
-	margin-top: 20px;
 }
 
 

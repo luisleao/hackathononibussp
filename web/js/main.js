@@ -28,6 +28,8 @@ var tmrInterval;
 var mapOptions;
 var saopaulo;
 
+var total_blt;
+
 
 
 
@@ -43,10 +45,10 @@ var addMarker = function(cod_veiculo, veiculo){
       //visible: false
     });
 
-    //marker.infoWindow = new google.maps.InfoWindow();
-    //google.maps.event.addListener(marker, 'click', function(event){
-	//	if (this.infoWindow) this.infoWindow.open(map, this);
-    //});
+    marker.infoWindow = new google.maps.InfoWindow();
+    google.maps.event.addListener(marker, 'click', function(event){
+		if (this.infoWindow) this.infoWindow.open(map, this);
+    });
 
     //veiculo.marker = marker;
     markers[cod_veiculo] = marker;
@@ -140,6 +142,33 @@ var atualiza_tempo = function(){
 	}
 
 
+	for (veiculo_idx in current_line.blts) {
+		var veiculo = current_line.blts[veiculo_idx]; //array
+		for (idx in veiculo) {
+			var blt_item = veiculo[idx];
+			if (blt_item[0]*1000 <= data) {
+
+				console.log("carrega bilhete ", blt_item);
+				total_blt += blt_item[1];
+
+				var sentido = current_line.sentidos[blt_item[2]];
+				sentido.total_blt += blt_item[1];
+				$("#sentido_"+blt_item[2]+" .total_bilhetagem").text(sentido.total_blt + " bilhetes");
+
+				//TODO: implementar infoWindow
+				//markers[veiculo_idx].infoWindow.setContent("última bilhetagem: " + avl_item[0]);
+
+				veiculo.push(veiculo.shift());
+
+			} else {
+				break;
+			}
+		}
+	}
+	//
+
+
+
 
 
 };
@@ -178,14 +207,15 @@ var formataTempo = function(seconds) {
 
 var loadLine = function(line){
 	current_line = null;
+	total_blt = 0;
 	console.log("carregando linha ", line);
 
 	jQuery.getJSON("/data/linhas/"+line+".json", function(data){
 		console.log(line, data);
 		current_line = data;
 		current_line.veiculos = {};
+		current_line.blts = {};
 		current_line.carregou_sentidos = false;
-
 
 		//desenhar no mapa o tracado dos sentidos da linha
 		clearPolylines();
@@ -229,24 +259,27 @@ var loadLine = function(line){
 			jQuery.getJSON("/data/linhas/blt/"+line.replace("-","")+sentido_idx+"_blt.json", function(data) {
 				console.log("data blt", data);
 				//TODO: ver dados BLT e inserir na planilha
-				/*
+
 				var sentido_idx = data.cod_linha.substring(data.cod_linha.length-1);
 				for (var veiculo_id in data.veiculos) {
-					if (!sentido.veiculos[veiculo_id]) {
-						sentido.veiculos[veiculo_id] = [];
+					if (!sentido.bilhetagems[veiculo_id]) {
+						sentido.bilhetagems[veiculo_id] = [];
 					}
-					veiculo_avl = sentido.veiculos[veiculo_id];
-					var avls = data.veiculos[veiculo_id]; //eh um array
-					for (avl_idx in avls) {
-						avl_item = avls[avl_idx];
-						avl_item[0] = parseInt(avl_item[0]); //TODO: BUG - corrigir importacao do AVL e passar inteiro direto
-						avl_item.push(parseInt(sentido_idx)); //TODO: BUG - formatar codigo da linha e criar campo com sentido
+					veiculo_blt = sentido.bilhetagems[veiculo_id];
+					/*
+					var blts = data.veiculos[veiculo_id]; //eh um array
+					for (blt_idx in blts) {
+						blt_item = blts[blt_idx];
+						blt_item[0] = parseInt(blt_item[0]); //TODO: BUG - corrigir importacao do AVL e passar inteiro direto
+						blt_item.push(parseInt(sentido_idx)); //TODO: BUG - formatar codigo da linha e criar campo com sentido
 					}
+					*/
 					//concatenar arrays de avl
-					veiculo_avl.concat(avls);
+					veiculo_blt.concat(blts);
 				}
-				*/
+				
 				sentido.carregou_blt = true;
+				sentido.total_blt = 0;
 
 			}); //.fail(function(){}).complete(function(){console.log("complete", sentido_idx);});
 
@@ -258,11 +291,10 @@ var loadLine = function(line){
 			var glyphicon_time = $("<span/>").addClass("glyphicon glyphicon-time");
 			var glyphicon_road = $("<span/>").addClass("glyphicon glyphicon-road");
 			var glyphicon_list = $("<span/>").addClass("glyphicon glyphicon-list");
+			var glyphicon_tags = $("<span/>").addClass("glyphicon glyphicon-chevron-tags");
 
 			var glyphicon_left = $("<span/>").addClass("glyphicon glyphicon-chevron-left");
 			var glyphicon_right = $("<span/>").addClass("glyphicon glyphicon-chevron-right");
-
-
 
 
 
@@ -270,6 +302,7 @@ var loadLine = function(line){
 			layer_sentido.append($("<span/>").addClass("item travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list)).append($("<br/>"));
+			layer_sentido.append($("<span/>").addClass("item total_bilhetagem").attr("title", "Total de bilhetagem").text("0 bilhetes").prepend(glyphicon_tags)).append($("<br/><br/>"));
 			//layer_sentido.append($("<div/>").addClass("working").text(sentido.working));
 			layer_sentido.append($("<span/>").addClass("item spark travel_" + sentido_idx).attr("title", "Viagens por horas [00-23]"));
 
