@@ -124,6 +124,7 @@ var atualiza_tempo = function(){
 
 	for (veiculo_idx in current_line.veiculos) {
 
+		// laço avl
 		var veiculo = current_line.veiculos[veiculo_idx]; //array
 		for (idx in veiculo) {
 			var avl_item = veiculo[idx];
@@ -139,10 +140,40 @@ var atualiza_tempo = function(){
 			}
 		}
 
+
+		// laço blt
+		//veiculo_idx
+		for (sentido_idx in current_line.sentidos) {
+			var sentido = current_line.sentidos[sentido_idx];
+			var blts = sentido.bilhetagens[veiculo_idx];
+
+			for (var blt_idx in blts) {
+				var blt = blts[blt_idx]; //tupla de bilhetagem
+				if (blt[0]*1000 <= data) {
+					var total_bilhetagem = parseInt($("#sentido_"+sentido_idx+" .total_bilhetagem .valor").text().split(" ")[0]) ;
+					$("#sentido_"+sentido_idx+" .total_bilhetagem .valor").text((total_bilhetagem+1) + " bilhetes");
+
+					//var total_bilhetagem = $("#sentido_"+sentido_idx+" .total_bilhetagem");
+					//total_bilhetagem.text(parseInt(total_bilhetagem.text()) + blt[0][1]);
+					blts.push(blts.shift());
+				} else {
+					break;
+				}
+			}
+
+			//sentido.total_blt += blt_item[1];
+
+
+
+
+		}
+
+
 	}
 
 
-	for (veiculo_idx in current_line.blts) {
+	//TODO: parei
+	for (veiculo_idx in current_line.veiculos) {
 		var veiculo = current_line.blts[veiculo_idx]; //array
 		for (idx in veiculo) {
 			var blt_item = veiculo[idx];
@@ -209,6 +240,7 @@ var loadLine = function(line){
 	current_line = null;
 	total_blt = 0;
 	console.log("carregando linha ", line);
+	$(".total_bilhetagem .valor").text("0 bilhetes");	
 
 	jQuery.getJSON("/data/linhas/"+line+".json", function(data){
 		console.log(line, data);
@@ -230,6 +262,7 @@ var loadLine = function(line){
 
 			var sentido = current_line.sentidos[sentido_idx];
 			var travel_time = formataTempo(sentido.travel_time);
+
 
 			// carregar AVL
 			sentido.carregou_avl = false;
@@ -257,29 +290,24 @@ var loadLine = function(line){
 			// carregar BLT
 			sentido.carregou_blt = false;
 			jQuery.getJSON("/data/linhas/blt/"+line.replace("-","")+sentido_idx+"_blt.json", function(data) {
-				console.log("data blt", data);
+				//console.log("data blt", data);
 				//TODO: ver dados BLT e inserir na planilha
 
 				var sentido_idx = data.cod_linha.substring(data.cod_linha.length-1);
+				var sentido = current_line.sentidos[sentido_idx];
+				sentido.bilhetagens = {};
+				sentido.total_blt = 0;
+
 				for (var veiculo_id in data.veiculos) {
-					if (!sentido.bilhetagems[veiculo_id]) {
-						sentido.bilhetagems[veiculo_id] = [];
+					bilhetagem_veiculo = data.veiculos[veiculo_id.toString()];
+
+					for (var idx_blt in bilhetagem_veiculo) {
+						sentido.total_blt += bilhetagem_veiculo[idx_blt][1];
 					}
-					veiculo_blt = sentido.bilhetagems[veiculo_id];
-					/*
-					var blts = data.veiculos[veiculo_id]; //eh um array
-					for (blt_idx in blts) {
-						blt_item = blts[blt_idx];
-						blt_item[0] = parseInt(blt_item[0]); //TODO: BUG - corrigir importacao do AVL e passar inteiro direto
-						blt_item.push(parseInt(sentido_idx)); //TODO: BUG - formatar codigo da linha e criar campo com sentido
-					}
-					*/
-					//concatenar arrays de avl
-					veiculo_blt.concat(blts);
+					sentido.bilhetagens[veiculo_id.toString()] = bilhetagem_veiculo;
 				}
 				
 				sentido.carregou_blt = true;
-				sentido.total_blt = 0;
 
 			}); //.fail(function(){}).complete(function(){console.log("complete", sentido_idx);});
 
@@ -302,7 +330,7 @@ var loadLine = function(line){
 			layer_sentido.append($("<span/>").addClass("item travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road)).append($("<br/>"));
 			layer_sentido.append($("<span/>").addClass("item total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list)).append($("<br/>"));
-			layer_sentido.append($("<span/>").addClass("item total_bilhetagem").attr("title", "Total de bilhetagem").text("0 bilhetes").prepend(glyphicon_tags)).append($("<br/><br/>"));
+			layer_sentido.append($("<span/>").addClass("item total_bilhetagem").attr("title", "Total de bilhetagem").append($("<span/>").addClass("valor").text("0 bilhetes")).prepend(glyphicon_tags)).append($("<br/><br/>"));
 			//layer_sentido.append($("<div/>").addClass("working").text(sentido.working));
 			layer_sentido.append($("<span/>").addClass("item spark travel_" + sentido_idx).attr("title", "Viagens por horas [00-23]"));
 
