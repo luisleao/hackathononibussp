@@ -78,8 +78,17 @@ def get_routes(): #routes.txt
 					"name": name,
 					"sentidos": {},
 				}
-				lista_linhas.append(id)
-				lista_linhas.append(name)
+
+
+				tokens = name.replace("- ", "").split(" ")
+				tokens.append(id)
+
+
+				lista_linhas.append({
+					"value": id,
+					"full_name": name,
+					"tokens": tokens
+				})
 
 
 

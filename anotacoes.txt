@@ -1,6 +1,7 @@
 
 datejs: https://code.google.com/p/datejs/downloads/list
-
+sparklines: http://omnipotent.net/jquery.sparkline/#s-about
+typeahead: http://twitter.github.io/typeahead.js
 
 
 

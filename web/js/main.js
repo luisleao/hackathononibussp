@@ -23,12 +23,14 @@ var PARAMS = {
 
 
 
+var mapOptions;
+var saopaulo;
 
 
 var initializeMap = function() {
 
-	var saopaulo = new google.maps.LatLng(-23.576732121654487, -46.633530120117186);
-	var mapOptions = {
+	saopaulo = new google.maps.LatLng(-23.576732121654487, -46.633530120117186);
+	mapOptions = {
 		zoom: 12,
 		center: saopaulo,
 		overviewMapControl: false,
@@ -45,7 +47,7 @@ var initializeMap = function() {
 
 	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
-	loadLine("106A-10");
+	//loadLine("106A-10");
 
 };
 
@@ -67,9 +69,8 @@ var loadLine = function(line){
 		//desenhar no mapa o tracado dos sentidos da linha
 		clearPolylines();
 
-		$(".linha").text(current_line.id);
+		$(".linha .numero").text(current_line.id);
 		$(".name_linha").text(current_line.name);
-
 
 		$(".sentidos").empty();
 
@@ -77,33 +78,60 @@ var loadLine = function(line){
 			var sentido = current_line.sentidos[sentido_idx];
 			var travel_time = formataTempo(sentido.travel_time);
 
-			var layer_sentido = $(document.createElement("div"));
+			var layer_sentido = $(document.createElement("div")).addClass("sentido_item").attr("id", "sentido_" + sentido_idx);
+
+
+			var glyphicon_time = $("<span/>").addClass("glyphicon glyphicon-time");
+			var glyphicon_road = $("<span/>").addClass("glyphicon glyphicon-road");
+			var glyphicon_list = $("<span/>").addClass("glyphicon glyphicon-list");
+
+			var glyphicon_left = $("<span/>").addClass("glyphicon glyphicon-chevron-left");
+			var glyphicon_right = $("<span/>").addClass("glyphicon glyphicon-chevron-right");
+
+			var span_partida = $("<small/>").text("partida: ");
+
+
+
+			layer_sentido.append($("<div/>").addClass("name").text(" " + sentido.name).prepend(span_partida)); //sentido_idx == 0 ? glyphicon_right : glyphicon_left));
+			layer_sentido.append($("<div/>").addClass("travel_time").attr("title", "Tempo do percurso").text(" " + travel_time).prepend(glyphicon_time));
+			layer_sentido.append($("<div/>").addClass("travel_distance").attr("title", "Distância do percurso").text(" " + (sentido.shapes.total_distance_traveled/1000).toFixed(2) + " km").prepend(glyphicon_road));
+			layer_sentido.append($("<div/>").addClass("total_travels").attr("title", "Total de viagens").text(" " + sentido.total_travels + " viagens").prepend(glyphicon_list));
+			//layer_sentido.append($("<div/>").addClass("working").text(sentido.working));
+			layer_sentido.append($("<div/>").addClass("spark travel_" + sentido_idx));
+
+
+			$(".sentidos").append(layer_sentido);
+			$(".sentidos .travel_" + sentido_idx).sparkline(sentido.travels, { type: 'bar', zeroAxis: false, disableTooltips: true });
 			
-
-
-
 			console.log(sentido_idx, sentido.travel_time, travel_time);
-			$(".travel_time").text(travel_time);
-			//console.log(sentido_idx, data.sentidos[sentido_idx].shapes.points);
 			drawPolyLine(sentido.shapes.points, PARAMS[sentido_idx].cor);
 		}
 
 		//TODO: carregar dados de IDA e VOLTA
+		if (polylines.length > 0) {
+			var latlngbounds = new google.maps.LatLngBounds();
+			for (polyline_idx in polylines) {
+				console.log(polylines[polyline_idx].getPath().length);
+				var path_array = polylines[polyline_idx].getPath().getArray();
+				
+				for (array_idx in path_array) {
+					latlngbounds.extend(path_array[array_idx]);
+				}
+			}
+			map.fitBounds(latlngbounds);
 
-/*
-working: "USD",
-travel_time: 26584,
-name: "Itaim Bibi",
-travel_discance: 0,
-shape_id: 43387,
-total_travels: 157
-*/
+		} else {
+			map.setOptions(mapOptions);
+		}
 
-
+		//map.setZoom(map.getZoom()+1);
 
 		//TODO: carregar dados AVL e BILHETAGEM
 		//TODO: criar markers para veiculos
 		//TODO: posicionar markers conforme horario e ajuste de horario
+
+		if (!$("body").hasClass("on"))
+			$("body").addClass("on");
 
 	});
 
@@ -113,8 +141,9 @@ total_travels: 157
 var clearPolylines = function(){
 	for (idx in polylines) {
 		polylines[idx].setMap(null);
-		delete(polylines[idx]);
 	}
+	polylines = [];
+
 }
 
 var drawPolyLine = function(shapes, color){
@@ -154,10 +183,27 @@ jQuery(document).ready(function($) {
 	google.maps.event.addDomListener(window, 'load', initializeMap);
 	
 
-	$(".modal").modal({show: false});
+	$(".modal").modal({show: false}).on("shown.bs.modal", function(){
+		switch ($(this).attr("id")) {
+			case "modal_selecionalinha":
+				$("#input_linha").focus()
+				break;
+		}
+	});
 
 
 	$("#modal_selecionalinha").modal("show");
+
+	$('#input_linha').typeahead({
+			prefetch: 'data/lista_linhas.json',
+			template: "<p><strong>{{value}}</strong>: {{full_name}}</p>",
+			limit: 5,
+			engine: Hogan
+		}).on("typeahead:selected", function(obj, datum){
+			loadLine(datum.value);
+			$("#modal_selecionalinha").modal("hide");
+
+		});
 
 
 });
