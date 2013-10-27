@@ -11,12 +11,12 @@ Utilize os scripts para converter os arquivos CSV (AVL, Bilhetagem e GTFS) para 
 
 
 ## Screenshot
-![screenshot](https://raw.github.com/luisleao/oicasa/master/docs/screen_0.png)
-![screenshot](https://raw.github.com/luisleao/oicasa/master/docs/screen_1.png)
+![screenshot](https://raw.github.com/luisleao/hackathononibussp/master/docs/screen_0.png)
+![screenshot](https://raw.github.com/luisleao/hackathononibussp/master/docs/screen_1.png)
 
 
 ## Diagrama de Entidade e Relacionamentos
-![der](https://raw.github.com/luisleao/oicasa/master/docs/scheme_AVL_BLT.png)
+![der](https://raw.github.com/luisleao/hackathononibussp/master/docs/scheme_AVL_BLT.png)
 
 
 
