@@ -22,7 +22,7 @@ var PARAMS = {
 		cor: "#555510"
 	},
 	interval: 1,
-	date: new Date(2013, 6, 1)
+	date: new Date(2013, 5, 1)
 
 }
 
@@ -33,14 +33,13 @@ var PARAMS = {
 var addMarker = function(cod_veiculo, veiculo){
 	console.log("addmarker ", veiculo);
 
-
 	//TODO: adicionar marcador na lista, deixar oculto e exibir quando o tempo tiver AVL
     var marker = new google.maps.Marker({
       position: new google.maps.LatLng(veiculo[0][1], veiculo[0][2]),
       map: map,
       animation: google.maps.Animation.DROP,
       //icon: icon_grey,
-      //visible: false
+      visible: false
     });
 
     marker.infoWindow = new google.maps.InfoWindow();
@@ -73,6 +72,8 @@ var carregou_blt = function(){
 }
 
 
+var icon_orange = "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_orange.png";
+var icon_blue = "http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_blue.png"
 
 
 
@@ -92,15 +93,50 @@ var atualiza_tempo = function(){
 
 	// não conta tempo enquanto nao carregar AVL
 
-	current_time++;
+	current_time+=1;
 	if (current_time >= 86400)
 		current_time = 0;
 
+
 	var data = PARAMS.date.getTime() + current_time*1000;
 
-
-
 	$(".datetime").text(new Date(data).toString("dd/MM/yyyy HH:mm:ss")); //new Date(data/1000 + (current_time))); //formataTempo(current_time));
+
+	//percorrer veiculos
+	//ver se timestamp do item eh menor e fazer o pop e transferir pra veiculo_old
+	//
+	//for(m in markers) { markers[m].setVisible(m == "11483")};
+
+	for (veiculo_idx in current_line.veiculos) {
+
+		//if (veiculo_idx != "11483") continue;
+		//veiculo_idx = "11483";
+
+		//console.log(veiculo_idx);
+		var veiculo = current_line.veiculos[veiculo_idx];
+		for (idx in veiculo) {
+			item = veiculo[idx];
+
+			//console.log(item[0]*1000 <= data, item[0]*1000, data);
+
+			if (item[0]*1000 <= data) {
+				veiculo_avl = veiculo.shift();
+				//console.log("virou ", new Date(veiculo_avl[0]*1000));
+				//map.setCenter(new google.maps.LatLng(veiculo_avl[1], veiculo_avl[2]));
+
+				markers[veiculo_idx].setPosition(new google.maps.LatLng(veiculo_avl[1], veiculo_avl[2]));
+				markers[veiculo_idx].setVisible(true);
+				markers[veiculo_idx].setIcon(veiculo_avl[3] == 0 ? icon_orange : icon_blue);
+				veiculo.push(veiculo_avl);
+			} else {
+				break;
+			}
+		}
+	}
+
+
+
+
 };
 
 
