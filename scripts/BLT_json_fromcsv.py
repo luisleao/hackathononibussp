@@ -39,7 +39,7 @@ for row in csv_data:
   blt_hshmap
 
   if not blt_hshmap.has_key(cod_linha):
-    blt_hshmap[cod_linha] = { "veiculos" : {} }
+    blt_hshmap[cod_linha] = { "cod_linha" : cod_linha, "veiculos" : {} }
 
   if not blt_hshmap[cod_linha]["veiculos"].has_key(veiculo):
     blt_hshmap[cod_linha]["veiculos"][veiculo] = {}
