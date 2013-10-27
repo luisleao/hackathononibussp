@@ -32,8 +32,9 @@ i = 0
 for row in csv_data:
   i = i+1
 
-  data = datetime(*strptime(row[0], "%d/%m/%Y %H:%M:%S")[0:6]).strftime("%s")
-  cod_linha = row[5] + ('0' if row[2] == "TP_TS" else '1')
+  data = int(datetime(*strptime(row[0], "%d/%m/%Y %H:%M:%S")[0:6]).strftime("%s"))
+  sentido = ('0' if row[2] == "TP_TS" else '1')
+  cod_linha = row[5] + sentido
   veiculo = str(row[3])
 
   blt_hshmap
@@ -45,9 +46,10 @@ for row in csv_data:
     blt_hshmap[cod_linha]["veiculos"][veiculo] = {}
 
   if not blt_hshmap[cod_linha]["veiculos"][veiculo].has_key(data):
-    blt_hshmap[cod_linha]["veiculos"][veiculo][data] = 0
+    blt_hshmap[cod_linha]["veiculos"][veiculo][data] = [0]
 
-  blt_hshmap[cod_linha]["veiculos"][veiculo][data] = blt_hshmap[cod_linha]["veiculos"][veiculo][data] + 1
+  blt_hshmap[cod_linha]["veiculos"][veiculo][data] = [blt_hshmap[cod_linha]["veiculos"][veiculo][data][0] + 1, int(sentido)]
+  #blt_hshmap[cod_linha]["veiculos"][veiculo].append(data)
 
   #print blt_hshmap
   #raw_input("continue...")
