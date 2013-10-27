@@ -188,7 +188,7 @@ var atualiza_tempo = function(){
 
 				var sentido = current_line.sentidos[blt_item[2]];
 				sentido.total_blt += blt_item[1];
-				$("#sentido_"+blt_item[2]+" .total_bilhetagem").text(sentido.total_blt + " bilhetes");
+				//$("#sentido_"+blt_item[2]+" .total_bilhetagem .valor").text(sentido.total_blt + " bilhetes");
 
 				//TODO: implementar infoWindow
 				//markers[veiculo_idx].infoWindow.setContent("última bilhetagem: " + avl_item[0]);
