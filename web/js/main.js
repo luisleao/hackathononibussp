@@ -57,6 +57,9 @@ var addMarker = function(cod_veiculo, veiculo){
 
 
 var carregou_avl = function(){
+	if (!current_line["sentidos"])
+		return;
+	
 	for (var sentido_idx in current_line.sentidos) {
 		if (!current_line.sentidos[sentido_idx].carregou_avl){
 			return false;
@@ -247,7 +250,7 @@ var loadLine = function(line){
 	$(".total_bilhetagem .valor").text("0 bilhetes");	
 	$(".datetime").text("---");
 
-	jQuery.getJSON("/data/linhas/"+line+".json", function(data){
+	jQuery.getJSON("data/linhas/"+line+".json", function(data){
 		//console.log(line, data);
 		current_line = data;
 		current_line.veiculos = {};
@@ -271,7 +274,7 @@ var loadLine = function(line){
 
 			// carregar AVL
 			sentido.carregou_avl = false;
-			jQuery.getJSON("/data/linhas/avl/"+line.replace("-","")+sentido_idx+"_avl.json", function(data) {
+			jQuery.getJSON("data/linhas/avl/"+line.replace("-","")+sentido_idx+"_avl.json", function(data) {
 				var sentido_idx = data.cod_linha.substring(data.cod_linha.length-1);
 				var sentido = current_line.sentidos[sentido_idx];
 
@@ -294,7 +297,7 @@ var loadLine = function(line){
 
 			// carregar BLT
 			sentido.carregou_blt = false;
-			jQuery.getJSON("/data/linhas/blt/"+line.replace("-","")+sentido_idx+"_blt.json", function(data) {
+			jQuery.getJSON("data/linhas/blt/"+line.replace("-","")+sentido_idx+"_blt.json", function(data) {
 				//console.log("data blt", data);
 				//TODO: ver dados BLT e inserir na planilha
 
